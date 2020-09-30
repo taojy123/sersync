@@ -1,6 +1,6 @@
 # sersync
 
-sersync docker image, easy to use.**
+sersync docker image, easy to use.
 
 ### First step, startup `sersync` on host1 as 192.168.1.10
 ```
