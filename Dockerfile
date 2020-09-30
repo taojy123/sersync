@@ -1,13 +1,12 @@
 FROM alpine:latest
 
-LABEL cn.magicarnea.description="Sersync Docker image based on alpine." \
-      cn.magicarnea.vendor="MagicArena" \
-      cn.magicarnea.maintainer="everoctivian@gmail.com" \
-      cn.magicarnea.versionCode=1 \
-      cn.magicarnea.versionName="1.0.0"
+LABEL description="sersync docker image, easy to use"
+LABEL maintainer="taojy123@163.com"
+LABEL note="Please map the host port 873 to container port 873, or use host network."
 
-VOLUME /etc/sersync
-VOLUME /var/log/sersync
+ENV TARGET_HOST=should.been.set
+VOLUME /syncdir
+EXPOSE 873
 
 # if you want use APK mirror then uncomment, modify the mirror address to which you favor
 # RUN sed -i 's|http://dl-cdn.alpinelinux.org|https://mirrors.aliyun.com|g' /etc/apk/repositories
@@ -19,21 +18,17 @@ RUN set -ex && \
     echo $TZ > /etc/timezone && \
     rm -rf /tmp/* /var/cache/apk/*
 
-COPY sersync2.5.4_64bit_binary_stable_final.tar.gz /tmp/
+COPY . /root
 
-WORKDIR /tmp
+WORKDIR /root
 
 RUN set -ex && \
-    touch /var/log/sersync/rsync_fail_log.sh && \
-    mkdir -p /etc/sersync && \
-    mkdir -p /var/log/sersync && \
-    tar -xzvf /tmp/sersync2.5.4_64bit_binary_stable_final.tar.gz && \
-    cp -a /tmp/GNU-Linux-x86/sersync2 /usr/bin/ && \
-    cp -a /tmp/GNU-Linux-x86/confxml.xml /etc/sersync/confxml.xml && \
+    touch /tmp/rsyncd.log && \
+    touch /tmp/rsync_fail_log.sh && \
+    mv rsyncd.conf /etc/rsyncd.conf && \
+    mv sersync2 /usr/bin/sersync2 && \
     chmod +x /usr/bin/sersync2 && \
-    rm -rf /tmp/GNU-Linux-x86 && \
-    rm -f /tmp/sersync2.5.4_64bit_binary_stable_final.tar.gz
+    chmod +x startup.sh && \
+    sed -i 's/\r//' startup.sh
 
-CMD ["-r"]
-
-ENTRYPOINT /usr/bin/sersync2 -o /etc/sersync/confxml.xml
+CMD sh startup.sh
