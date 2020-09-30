@@ -2,7 +2,7 @@ FROM alpine:latest
 
 LABEL description="sersync docker image, easy to use"
 LABEL maintainer="taojy123@163.com"
-LABEL note="Please map the host port 873 to container port 873, or use host network."
+LABEL note="Please publish the container's port 873 to host port 873, or use host network."
 
 ENV TARGET_HOST=should.been.set
 VOLUME /syncdir
